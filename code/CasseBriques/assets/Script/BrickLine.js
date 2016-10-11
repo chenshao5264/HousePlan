@@ -41,10 +41,12 @@ cc.Class({
 
     },
 
-    onGameStart: function() {
-        dataMgr.getInstance().isGameOver = false;
+    onGameStart: function(event) {
+        var target = event.target;
+        target.active = false;
+        //dataMgr.getInstance().isGameOver = false;
         this.parent.removeAllChildren();
-        this.createtLine();  
+        //this.createtLine();  
     },
 
     createtLine: function() {

@@ -734,8 +734,8 @@ declare module cc {
 	``` 
 	*/
 	export function repeat(action : FiniteTimeAction, times : number) : ActionInterval;	
-	/** !#en Create a acton which repeat forever
-	!#zh 永远地重复一个动作，有限次数内重复一个动作请使用 repeat 动作。
+	/** !#en Create a acton which repeat forever, as it runs forever, it can't be added into cc.sequence and cc.spawn.
+	!#zh 永远地重复一个动作，有限次数内重复一个动作请使用 repeat 动作，由于这个动作不会停止，所以不能被添加到 cc.sequence 或 cc.spawn 中。
 	
 	@example 
 	```js
@@ -1878,143 +1878,6 @@ declare module cc {
 		WARN_FOR_WEB_PAGE = 0,
 		ERROR_FOR_WEB_PAGE = 0,	
 	}		
-		/** !#en Class for animation data handling.
-		!#zh 动画剪辑，用于存储动画数据。 */
-		export class AnimationClip extends Asset {		
-		constructor();		
-		/** !#en Duration of this animation.
-		!#zh 动画的持续时间。 */
-		duration : number;		
-		/** !#en FrameRate of this animation.
-		!#zh 动画的帧速率。 */
-		sample : number;		
-		/** !#en Speed of this animation.
-		!#zh 动画的播放速度。 */
-		speed : number;		
-		/** !#en WrapMode of this animation.
-		!#zh 动画的循环模式。 */
-		wrapMode : WrapMode;		
-		/** !#en Curve data.
-		!#zh 曲线数据。 */
-		curveData : any;		
-		/** !#en Event data.
-		!#zh 事件数据。 */
-		events : any[];		
-		/** !#en Crate clip with a set of sprite frames
-		!#zh 使用一组序列帧图片来创建动画剪辑
-		
-		@example 
-		```js
-		var clip = cc.AnimationClip.createWithSpriteFrames(spriteFrames, 10);
-		``` 
-		*/
-		createWithSpriteFrames(spriteFrames : [SpriteFrame], sample : number) : AnimationClip;	
-	}		
-		/** !#en
-		The AnimationState gives full control over animation playback process.
-		In most cases the Animation Component is sufficient and easier to use. Use the AnimationState if you need full control.
-		!#zh
-		AnimationState 完全控制动画播放过程。<br/>
-		大多数情况下 动画组件 是足够和易于使用的。如果您需要更多的动画控制接口，请使用 AnimationState。 */
-		export class AnimationState extends AnimationNode {		
-		constructor();		
-		/**  
-		*/
-		AnimationState(clip : AnimationClip, name? : string) : AnimationState;		
-		/** !#en The clip that is being played by this animation state.
-		!#zh 此动画状态正在播放的剪辑。 */
-		clip : AnimationClip;		
-		/** !#en The name of the playing animation.
-		!#zh 动画的名字 */
-		name : string;	
-	}		
-		/** undefined */
-		export class Playable {		
-		constructor();		
-		/** !#en Is playing or paused in play mode?
-		!#zh 当前是否正在播放。 */
-		isPlaying : boolean;		
-		/** !#en Is currently paused? This can be true even if in edit mode(isPlaying == false).
-		!#zh 当前是否正在暂停 */
-		isPaused : boolean;		
-		/** !#en Play this animation.
-		!#zh 播放动画。 
-		*/
-		play() : void;		
-		/** !#en Stop this animation.
-		!#zh 停止动画播放。 
-		*/
-		stop() : void;		
-		/** !#en Pause this animation.
-		!#zh 暂停动画。 
-		*/
-		pause() : void;		
-		/** !#en Resume this animation.
-		!#zh 重新播放动画。 
-		*/
-		resume() : void;		
-		/** !#en Perform a single frame step.
-		!#zh 执行一帧动画。 
-		*/
-		step() : void;	
-	}	
-	/** !#en Specifies how time is treated when it is outside of the keyframe range of an Animation.
-	!#zh 动画使用的循环模式。 */
-	export enum WrapMode {		
-		Default = 0,
-		Normal = 0,
-		Reverse = 0,
-		Loop = 0,
-		LoopReverse = 0,
-		PingPong = 0,
-		PingPongReverse = 0,	
-	}		
-		/** !#en The abstract interface for all playing animation.
-		!#zh 所有播放动画的抽象接口。 */
-		export class AnimationNodeBase extends Playable {		
-		constructor();	
-	}		
-		/** !#en The collection and instance of playing animations.
-		!#zh 动画曲线的集合，根据当前时间计算出每条曲线的状态。 */
-		export class AnimationNode extends AnimationNodeBase {		
-		/** 
-		@param timingInput This dictionary is used as a convenience for specifying the timing properties of an Animation in bulk. 
-		*/
-		constructor(animator : Animator, curves? : AnimCurve[], timingInput? : any);		
-		/** !#en The curves list.
-		!#zh 曲线列表。 */
-		curves : AnimCurve[];		
-		/** !#en The start delay which represents the number of seconds from an animation's start time to the start of
-		the active interval.
-		!#zh 延迟多少秒播放。 */
-		delay : number;		
-		/** !#en The animation's iteration count property.
-		
-		A real number greater than or equal to zero (including positive infinity) representing the number of times
-		to repeat the animation node.
-		
-		Values less than zero and NaN values are treated as the value 1.0 for the purpose of timing model
-		calculations.
-		
-		!#zh 迭代次数，指动画播放多少次后结束, normalize time。 如 2.5（2次半） */
-		repeatCount : number;		
-		/** !#en The iteration duration of this animation in seconds. (length)
-		!#zh 单次动画的持续时间，秒。 */
-		duration : number;		
-		/** !#en The animation's playback speed. 1 is normal playback speed.
-		!#zh 播放速率。 */
-		speed : number;		
-		/** !#en
-		Wrapping mode of the playing animation.
-		Notice : dynamic change wrapMode will reset time and repeatCount property
-		!#zh
-		动画循环方式。
-		需要注意的是，动态修改 wrapMode 时，会重置 time 以及 repeatCount */
-		wrapMode : WrapMode;		
-		/** !#en The current time of this animation in seconds.
-		!#zh 动画当前的时间，秒。 */
-		time : number;	
-	}		
 		/** !#en cc.audioEngine is the singleton object, it provide simple audio APIs.
 		!#zh
 		cc.audioengine是单例对象。<br/>
@@ -2349,6 +2212,143 @@ declare module cc {
 		!#zh 永远地重复一个动作，有限次数内重复一个动作请使用 Repeat 动作。 
 		*/
 		repeatForever() : ActionInterval;	
+	}		
+		/** !#en Class for animation data handling.
+		!#zh 动画剪辑，用于存储动画数据。 */
+		export class AnimationClip extends Asset {		
+		constructor();		
+		/** !#en Duration of this animation.
+		!#zh 动画的持续时间。 */
+		duration : number;		
+		/** !#en FrameRate of this animation.
+		!#zh 动画的帧速率。 */
+		sample : number;		
+		/** !#en Speed of this animation.
+		!#zh 动画的播放速度。 */
+		speed : number;		
+		/** !#en WrapMode of this animation.
+		!#zh 动画的循环模式。 */
+		wrapMode : WrapMode;		
+		/** !#en Curve data.
+		!#zh 曲线数据。 */
+		curveData : any;		
+		/** !#en Event data.
+		!#zh 事件数据。 */
+		events : any[];		
+		/** !#en Crate clip with a set of sprite frames
+		!#zh 使用一组序列帧图片来创建动画剪辑
+		
+		@example 
+		```js
+		var clip = cc.AnimationClip.createWithSpriteFrames(spriteFrames, 10);
+		``` 
+		*/
+		createWithSpriteFrames(spriteFrames : [SpriteFrame], sample : number) : AnimationClip;	
+	}		
+		/** !#en
+		The AnimationState gives full control over animation playback process.
+		In most cases the Animation Component is sufficient and easier to use. Use the AnimationState if you need full control.
+		!#zh
+		AnimationState 完全控制动画播放过程。<br/>
+		大多数情况下 动画组件 是足够和易于使用的。如果您需要更多的动画控制接口，请使用 AnimationState。 */
+		export class AnimationState extends AnimationNode {		
+		constructor();		
+		/**  
+		*/
+		AnimationState(clip : AnimationClip, name? : string) : AnimationState;		
+		/** !#en The clip that is being played by this animation state.
+		!#zh 此动画状态正在播放的剪辑。 */
+		clip : AnimationClip;		
+		/** !#en The name of the playing animation.
+		!#zh 动画的名字 */
+		name : string;	
+	}		
+		/** undefined */
+		export class Playable {		
+		constructor();		
+		/** !#en Is playing or paused in play mode?
+		!#zh 当前是否正在播放。 */
+		isPlaying : boolean;		
+		/** !#en Is currently paused? This can be true even if in edit mode(isPlaying == false).
+		!#zh 当前是否正在暂停 */
+		isPaused : boolean;		
+		/** !#en Play this animation.
+		!#zh 播放动画。 
+		*/
+		play() : void;		
+		/** !#en Stop this animation.
+		!#zh 停止动画播放。 
+		*/
+		stop() : void;		
+		/** !#en Pause this animation.
+		!#zh 暂停动画。 
+		*/
+		pause() : void;		
+		/** !#en Resume this animation.
+		!#zh 重新播放动画。 
+		*/
+		resume() : void;		
+		/** !#en Perform a single frame step.
+		!#zh 执行一帧动画。 
+		*/
+		step() : void;	
+	}	
+	/** !#en Specifies how time is treated when it is outside of the keyframe range of an Animation.
+	!#zh 动画使用的循环模式。 */
+	export enum WrapMode {		
+		Default = 0,
+		Normal = 0,
+		Reverse = 0,
+		Loop = 0,
+		LoopReverse = 0,
+		PingPong = 0,
+		PingPongReverse = 0,	
+	}		
+		/** !#en The abstract interface for all playing animation.
+		!#zh 所有播放动画的抽象接口。 */
+		export class AnimationNodeBase extends Playable {		
+		constructor();	
+	}		
+		/** !#en The collection and instance of playing animations.
+		!#zh 动画曲线的集合，根据当前时间计算出每条曲线的状态。 */
+		export class AnimationNode extends AnimationNodeBase {		
+		/** 
+		@param timingInput This dictionary is used as a convenience for specifying the timing properties of an Animation in bulk. 
+		*/
+		constructor(animator : Animator, curves? : AnimCurve[], timingInput? : any);		
+		/** !#en The curves list.
+		!#zh 曲线列表。 */
+		curves : AnimCurve[];		
+		/** !#en The start delay which represents the number of seconds from an animation's start time to the start of
+		the active interval.
+		!#zh 延迟多少秒播放。 */
+		delay : number;		
+		/** !#en The animation's iteration count property.
+		
+		A real number greater than or equal to zero (including positive infinity) representing the number of times
+		to repeat the animation node.
+		
+		Values less than zero and NaN values are treated as the value 1.0 for the purpose of timing model
+		calculations.
+		
+		!#zh 迭代次数，指动画播放多少次后结束, normalize time。 如 2.5（2次半） */
+		repeatCount : number;		
+		/** !#en The iteration duration of this animation in seconds. (length)
+		!#zh 单次动画的持续时间，秒。 */
+		duration : number;		
+		/** !#en The animation's playback speed. 1 is normal playback speed.
+		!#zh 播放速率。 */
+		speed : number;		
+		/** !#en
+		Wrapping mode of the playing animation.
+		Notice : dynamic change wrapMode will reset time and repeatCount property
+		!#zh
+		动画循环方式。
+		需要注意的是，动态修改 wrapMode 时，会重置 time 以及 repeatCount */
+		wrapMode : WrapMode;		
+		/** !#en The current time of this animation in seconds.
+		!#zh 动画当前的时间，秒。 */
+		time : number;	
 	}		
 		/** !#en
 		cc.ActionManager is a class that can manage actions.<br/>
@@ -4287,131 +4287,6 @@ declare module cc {
 		*/
 		drainAllPools() : void;	
 	}		
-		/** !#en
-		Base class for handling assets used in Fireball. This class can be instantiate.
-		
-		You may want to override:<br/>
-		- createNode<br/>
-		- cc.Object._serialize<br/>
-		- cc.Object._deserialize<br/>
-		!#zh
-		资源基类，该类可以被实例化。<br/>
-		
-		您可能需要重写：<br/>
-		- createNode <br/>
-		- cc.Object._serialize<br/>
-		- cc.Object._deserialize<br/> */
-		export class Asset extends RawAsset {		
-		constructor();		
-		/** !#en
-		Returns the url of this asset's first raw file, if none of rawFile exists,
-		it will returns an empty string.
-		!#zh 返回该资源的原始文件的 URL，如果不支持 RAW 文件，它将返回一个空字符串。 */
-		rawUrl : string;		
-		/** !#en
-		Returns the url of this asset's raw files, if none of rawFile exists,
-		it will returns an empty array.
-		!#zh 返回该资源的原文件的 URL 数组，如果不支持 RAW 文件，它将返回一个空数组。 */
-		rawUrls : String[];		
-		/** !#en Indicates whether its dependent raw assets can support deferred load if the owner scene is marked as `asyncLoadAssets`.
-		!#zh 当场景被标记为 `asyncLoadAssets`，禁止延迟加载该资源所依赖的其它 RawAsset。 */
-		preventDeferredLoadDependents : boolean;		
-		/** !#en
-		Create a new node using this asset in the scene.<br/>
-		If this type of asset dont have its corresponding node type, this method should be null.
-		!#zh
-		使用该资产在场景中创建一个新节点。<br/>
-		如果这类资产没有相应的节点类型，该方法应该是空的。 
-		*/
-		createNode(callback: (error: string, node: any) => void) : void;	
-	}		
-		/** !#en Class for audio data handling.
-		!#zh 音频资源类。 */
-		export class AudioClip extends RawAsset {		
-		constructor();	
-	}		
-		/** !#en Class for BitmapFont handling.
-		!#zh 位图字体资源类。 */
-		export class BitmapFont extends RawAsset {		
-		constructor();	
-	}		
-		/** !#en Class for Font handling.
-		!#zh 字体资源类。 */
-		export class Font extends RawAsset {		
-		constructor();	
-	}		
-		/** !#en Class for prefab handling.
-		!#zh 预制资源类。 */
-		export class Prefab extends Asset {		
-		constructor();	
-	}		
-		/** !#en
-		The base class for registering asset types.
-		
-		You may want to override:
-		- createNode (static)
-		!#zh
-		注册用的资源基类。<br/>
-		你可能要重写：<br/>
-		- createNode (static) */
-		export class RawAsset extends CCObject {		
-		/** !#en
-		Create a new node in the scene.<br/>
-		If this type of asset dont have its corresponding node type, this method should be null.
-		!#zh
-		在场景中创建一个新节点。<br/>
-		如果这类资源没有相应的节点类型，该方法应该是空的。 
-		*/
-		createNodeByInfo(Info : any, callback: (error: string, node: any) => void) : void;	
-	}		
-		/** !#en Class for scene handling.
-		!#zh 场景资源类。 */
-		export class SceneAsset extends Asset {		
-		constructor();		
-		scene : cc.Scene;		
-		/** !#en Indicates the raw assets of this scene can be load after scene launched.
-		!#zh 指示该场景依赖的资源可否在场景切换后再延迟加载。 */
-		asyncLoadAssets : boolean;	
-	}		
-		/** !#en Class for script handling.
-		!#zh Script 资源类。 */
-		export class _Script extends Asset {		
-		constructor();	
-	}		
-		/** !#en Class for JavaScript handling.
-		!#zh JavaScript 资源类。 */
-		export class _JavaScript extends Asset {		
-		constructor();	
-	}		
-		/** !#en Class for coffee script handling.
-		!#zh CoffeeScript 资源类。 */
-		export class CoffeeScript extends Asset {		
-		constructor();	
-	}		
-		/** !#en Class for sprite atlas handling.
-		!#zh 精灵图集资源类。 */
-		export class SpriteAtlas extends RawAsset {		
-		constructor();		
-		/** Returns the texture of the sprite atlas 
-		*/
-		getTexture() : cc.Texture2D;		
-		/** Returns the sprite frame correspond to the given key in sprite atlas. 
-		*/
-		getSpriteFrame(key : string) : SpriteFrame;		
-		/** Returns the sprite frames in sprite atlas. 
-		*/
-		getSpriteFrames() : [SpriteFrame];	
-	}		
-		/** !#en Class for TTFFont handling.
-		!#zh TTF 字体资源类。 */
-		export class TTFFont extends Asset {		
-		constructor();	
-	}		
-		/** !#en Class for text file.
-		!#zh 文本资源类。 */
-		export class TextAsset extends Asset {		
-		constructor();	
-	}		
 		/** !#en Box Collider.
 		!#zh 包围盒碰撞组件 */
 		export class BoxCollider extends Component {		
@@ -4537,6 +4412,131 @@ declare module cc {
 		/** !#en Polygon points
 		!#zh 多边形顶点数组 */
 		points : [Vec2];	
+	}		
+		/** !#en
+		Base class for handling assets used in Fireball. This class can be instantiate.
+		
+		You may want to override:<br/>
+		- createNode<br/>
+		- cc.Object._serialize<br/>
+		- cc.Object._deserialize<br/>
+		!#zh
+		资源基类，该类可以被实例化。<br/>
+		
+		您可能需要重写：<br/>
+		- createNode <br/>
+		- cc.Object._serialize<br/>
+		- cc.Object._deserialize<br/> */
+		export class Asset extends RawAsset {		
+		constructor();		
+		/** !#en
+		Returns the url of this asset's first raw file, if none of rawFile exists,
+		it will returns an empty string.
+		!#zh 返回该资源的原始文件的 URL，如果不支持 RAW 文件，它将返回一个空字符串。 */
+		rawUrl : string;		
+		/** !#en
+		Returns the url of this asset's raw files, if none of rawFile exists,
+		it will returns an empty array.
+		!#zh 返回该资源的原文件的 URL 数组，如果不支持 RAW 文件，它将返回一个空数组。 */
+		rawUrls : String[];		
+		/** !#en Indicates whether its dependent raw assets can support deferred load if the owner scene is marked as `asyncLoadAssets`.
+		!#zh 当场景被标记为 `asyncLoadAssets`，禁止延迟加载该资源所依赖的其它 RawAsset。 */
+		preventDeferredLoadDependents : boolean;		
+		/** !#en
+		Create a new node using this asset in the scene.<br/>
+		If this type of asset dont have its corresponding node type, this method should be null.
+		!#zh
+		使用该资产在场景中创建一个新节点。<br/>
+		如果这类资产没有相应的节点类型，该方法应该是空的。 
+		*/
+		createNode(callback: (error: string, node: any) => void) : void;	
+	}		
+		/** !#en Class for audio data handling.
+		!#zh 音频资源类。 */
+		export class AudioClip extends RawAsset {		
+		constructor();	
+	}		
+		/** !#en Class for BitmapFont handling.
+		!#zh 位图字体资源类。 */
+		export class BitmapFont extends RawAsset {		
+		constructor();	
+	}		
+		/** !#en Class for Font handling.
+		!#zh 字体资源类。 */
+		export class Font extends RawAsset {		
+		constructor();	
+	}		
+		/** !#en Class for prefab handling.
+		!#zh 预制资源类。 */
+		export class Prefab extends Asset {		
+		constructor();	
+	}		
+		/** !#en
+		The base class for registering asset types.
+		
+		You may want to override:
+		- createNode (static)
+		!#zh
+		注册用的资源基类。<br/>
+		你可能要重写：<br/>
+		- createNode (static) */
+		export class RawAsset extends CCObject {		
+		/** !#en
+		Create a new node in the scene.<br/>
+		If this type of asset dont have its corresponding node type, this method should be null.
+		!#zh
+		在场景中创建一个新节点。<br/>
+		如果这类资源没有相应的节点类型，该方法应该是空的。 
+		*/
+		createNodeByInfo(Info : any, callback: (error: string, node: any) => void) : void;	
+	}		
+		/** !#en Class for scene handling.
+		!#zh 场景资源类。 */
+		export class SceneAsset extends Asset {		
+		constructor();		
+		scene : cc.Scene;		
+		/** !#en Indicates the raw assets of this scene can be load after scene launched.
+		!#zh 指示该场景依赖的资源可否在场景切换后再延迟加载。 */
+		asyncLoadAssets : boolean;	
+	}		
+		/** !#en Class for script handling.
+		!#zh Script 资源类。 */
+		export class _Script extends Asset {		
+		constructor();	
+	}		
+		/** !#en Class for JavaScript handling.
+		!#zh JavaScript 资源类。 */
+		export class _JavaScript extends Asset {		
+		constructor();	
+	}		
+		/** !#en Class for coffee script handling.
+		!#zh CoffeeScript 资源类。 */
+		export class CoffeeScript extends Asset {		
+		constructor();	
+	}		
+		/** !#en Class for sprite atlas handling.
+		!#zh 精灵图集资源类。 */
+		export class SpriteAtlas extends RawAsset {		
+		constructor();		
+		/** Returns the texture of the sprite atlas 
+		*/
+		getTexture() : cc.Texture2D;		
+		/** Returns the sprite frame correspond to the given key in sprite atlas. 
+		*/
+		getSpriteFrame(key : string) : SpriteFrame;		
+		/** Returns the sprite frames in sprite atlas. 
+		*/
+		getSpriteFrames() : [SpriteFrame];	
+	}		
+		/** !#en Class for TTFFont handling.
+		!#zh TTF 字体资源类。 */
+		export class TTFFont extends Asset {		
+		constructor();	
+	}		
+		/** !#en Class for text file.
+		!#zh 文本资源类。 */
+		export class TextAsset extends Asset {		
+		constructor();	
 	}		
 		/** !#en The animation component is used to play back animations.
 		
@@ -5495,57 +5495,6 @@ declare module cc {
 		*/
 		getContentPosition() : Position;	
 	}		
-		/** !#en A distortion used to change the rendering of simple sprite.If will take effect after sprite component is added.
-		!#zh 扭曲效果组件,用于改变SIMPLE类型sprite的渲染,只有当sprite组件已经添加后,才能起作用. */
-		export class SpriteDistortion extends Component {		
-		/** !#en Change the UV offset for distortion rendering.
-		!#zh 在渲染时改变UV的整体偏移. */
-		offset : Vec2;		
-		/** !#en Change the UV scale for distortion rendering.
-		!#zh 在渲染时改变UV的寻址系数 */
-		tiling : Vec2;	
-	}		
-		/** !#en cc.VideoPlayer is a component for playing videos, you can use it for showing videos in your game.
-		!#zh Video 组件，用于在游戏中播放视频 */
-		export class VideoPlayer extends _RendererUnderSG {		
-		/** !#en The resource type of videoplayer, REMOTE for remote url and LOCAL for local file path.
-		!#zh 视频来源：REMOTE 表示远程视频 URL，LOCAL 表示本地视频地址。 */
-		resourceType : VideoPlayer.ResourceType;		
-		/** !#en The remote URL of video.
-		!#zh 远程视频的 URL */
-		remoteURL : string;		
-		/** !#en The local video full path.
-		!#zh 本地视频的 URL */
-		video : string;		
-		/** !#en The current playback time of the now playing item in seconds, you could also change the start playback time.
-		!#zh 指定视频从什么时间点开始播放，单位是秒，也可以用来获取当前视频播放的时间进度。 */
-		currentTime : number;		
-		/** !#en Whether keep the aspect ration of the original video.
-		!#zh 是否保持视频原来的宽高比 */
-		keepAspectRatio : boolean;		
-		/** !#en Whether play video in fullscreen mode.
-		!#zh 是否全屏播放视频 */
-		isFullscreen : boolean;		
-		/** !#en the video player's callback, it will be triggered when certain event occurs, like: playing, paused, stopped and completed.
-		!#zh 视频播放回调函数，该回调函数会在特定情况被触发，比如播放中，暂时，停止和完成播放。 */
-		videoPlayerEvent : cc.Component.EventHandler[];		
-		/** !#en If a video is paused, call this method could resume playing. If a video is stopped, call this method to play from scratch.
-		!#zh 如果视频被暂停播放了，调用这个接口可以继续播放。如果视频被停止播放了，调用这个接口可以从头开始播放。 
-		*/
-		play() : void;		
-		/** !#en If a video is paused, call this method to resume playing.
-		!#zh 如果一个视频播放被暂停播放了，调用这个接口可以继续播放。 
-		*/
-		resume() : void;		
-		/** !#en If a video is playing, call this method to pause playing.
-		!#zh 如果一个视频正在播放，调用这个接口可以暂停播放。 
-		*/
-		pause() : void;		
-		/** !#en If a video is playing, call this method to stop playing immediately.
-		!#zh 如果一个视频正在播放，调用这个接口可以立马停止播放。 
-		*/
-		stop() : void;	
-	}		
 		/** !#en Renders a sprite in the scene.
 		!#zh 该组件用于在场景中渲染精灵。 */
 		export class Sprite extends _RendererUnderSG {		
@@ -5667,6 +5616,57 @@ declare module cc {
 		``` 
 		*/
 		getInsetBottom() : number;	
+	}		
+		/** !#en A distortion used to change the rendering of simple sprite.If will take effect after sprite component is added.
+		!#zh 扭曲效果组件,用于改变SIMPLE类型sprite的渲染,只有当sprite组件已经添加后,才能起作用. */
+		export class SpriteDistortion extends Component {		
+		/** !#en Change the UV offset for distortion rendering.
+		!#zh 在渲染时改变UV的整体偏移. */
+		offset : Vec2;		
+		/** !#en Change the UV scale for distortion rendering.
+		!#zh 在渲染时改变UV的寻址系数 */
+		tiling : Vec2;	
+	}		
+		/** !#en cc.VideoPlayer is a component for playing videos, you can use it for showing videos in your game.
+		!#zh Video 组件，用于在游戏中播放视频 */
+		export class VideoPlayer extends _RendererUnderSG {		
+		/** !#en The resource type of videoplayer, REMOTE for remote url and LOCAL for local file path.
+		!#zh 视频来源：REMOTE 表示远程视频 URL，LOCAL 表示本地视频地址。 */
+		resourceType : VideoPlayer.ResourceType;		
+		/** !#en The remote URL of video.
+		!#zh 远程视频的 URL */
+		remoteURL : string;		
+		/** !#en The local video full path.
+		!#zh 本地视频的 URL */
+		clip : string;		
+		/** !#en The current playback time of the now playing item in seconds, you could also change the start playback time.
+		!#zh 指定视频从什么时间点开始播放，单位是秒，也可以用来获取当前视频播放的时间进度。 */
+		currentTime : number;		
+		/** !#en Whether keep the aspect ration of the original video.
+		!#zh 是否保持视频原来的宽高比 */
+		keepAspectRatio : boolean;		
+		/** !#en Whether play video in fullscreen mode.
+		!#zh 是否全屏播放视频 */
+		isFullscreen : boolean;		
+		/** !#en the video player's callback, it will be triggered when certain event occurs, like: playing, paused, stopped and completed.
+		!#zh 视频播放回调函数，该回调函数会在特定情况被触发，比如播放中，暂时，停止和完成播放。 */
+		videoPlayerEvent : cc.Component.EventHandler[];		
+		/** !#en If a video is paused, call this method could resume playing. If a video is stopped, call this method to play from scratch.
+		!#zh 如果视频被暂停播放了，调用这个接口可以继续播放。如果视频被停止播放了，调用这个接口可以从头开始播放。 
+		*/
+		play() : void;		
+		/** !#en If a video is paused, call this method to resume playing.
+		!#zh 如果一个视频播放被暂停播放了，调用这个接口可以继续播放。 
+		*/
+		resume() : void;		
+		/** !#en If a video is playing, call this method to pause playing.
+		!#zh 如果一个视频正在播放，调用这个接口可以暂停播放。 
+		*/
+		pause() : void;		
+		/** !#en If a video is playing, call this method to stop playing immediately.
+		!#zh 如果一个视频正在播放，调用这个接口可以立马停止播放。 
+		*/
+		stop() : void;	
 	}		
 		/** !#en cc.WebView is a component for display web pages in the game
 		!#zh WebView 组件，用于在游戏中显示网页 */
@@ -6209,6 +6209,135 @@ declare module cc {
 		*/
 		setTouchInfo(id : number, x : number, y : number) : void;	
 	}		
+		/** undefined */
+		export class Graphics extends _RendererUnderSG {		
+		/** !#en
+		Current line width.
+		!#zh
+		当前线条宽度 */
+		lineWidth : number;		
+		/** !#en
+		lineJoin determines how two connecting segments (of lines, arcs or curves) with non-zero lengths in a shape are joined together.
+		!#zh
+		lineJoin 用来设置2个长度不为0的相连部分（线段，圆弧，曲线）如何连接在一起的属性。 */
+		lineJoin : Graphics.LineJoin;		
+		/** !#en
+		lineCap determines how the end points of every line are drawn.
+		!#zh
+		lineCap 指定如何绘制每一条线段末端。 */
+		lineCap : Graphics.LineCap;		
+		/** !#en
+		stroke color
+		!#zh
+		线段颜色 */
+		strokeColor : Color;		
+		/** !#en
+		fill color
+		!#zh
+		填充颜色 */
+		fillColor : Color;		
+		/** !#en
+		Sets the miter limit ratio
+		!#zh
+		设置斜接面限制比例 */
+		miterLimit : number;		
+		/** !#en Move path start point to (x,y).
+		!#zh 移动路径起点到坐标(x, y)
+		@param x The x axis of the coordinate for the end point.
+		@param y The y axis of the coordinate for the end point. 
+		*/
+		moveTo(x? : number, y? : number) : void;		
+		/** !#en Adds a straight line to the path
+		!#zh 绘制直线路径
+		@param x The x axis of the coordinate for the end point.
+		@param y The y axis of the coordinate for the end point. 
+		*/
+		lineTo(x? : number, y? : number) : void;		
+		/** !#en Adds a cubic Bézier curve to the path
+		!#zh 绘制三次贝赛尔曲线路径
+		@param c1x The x axis of the coordinate for the first control point.
+		@param c1y The y axis of the coordinate for first control point.
+		@param c2x The x axis of the coordinate for the second control point.
+		@param c2y The y axis of the coordinate for the second control point.
+		@param x The x axis of the coordinate for the end point.
+		@param y The y axis of the coordinate for the end point. 
+		*/
+		bezierCurveTo(c1x? : number, c1y? : number, c2x? : number, c2y? : number, x? : number, y? : number) : void;		
+		/** !#en Adds a quadratic Bézier curve to the path
+		!#zh 绘制二次贝赛尔曲线路径
+		@param cx The x axis of the coordinate for the control point.
+		@param cy The y axis of the coordinate for the control point.
+		@param x The x axis of the coordinate for the end point.
+		@param y The y axis of the coordinate for the end point. 
+		*/
+		quadraticCurveTo(cx? : number, cy? : number, x? : number, y? : number) : void;		
+		/** !#en Adds an arc to the path which is centered at (cx, cy) position with radius r starting at startAngle and ending at endAngle going in the given direction by counterclockwise (defaulting to false).
+		!#zh 绘制圆弧路径。圆弧路径的圆心在 (cx, cy) 位置，半径为 r ，根据 counterclockwise （默认为false）指定的方向从 startAngle 开始绘制，到 endAngle 结束。
+		@param cx The x axis of the coordinate for the center point.
+		@param cy The y axis of the coordinate for the center point.
+		@param r The arc's radius.
+		@param startAngle The angle at which the arc starts, measured clockwise from the positive x axis and expressed in radians.
+		@param endAngle The angle at which the arc ends, measured clockwise from the positive x axis and expressed in radians.
+		@param counterclockwise An optional Boolean which, if true, causes the arc to be drawn counter-clockwise between the two angles. By default it is drawn clockwise. 
+		*/
+		arc(cx? : number, cy? : number, r? : number, startAngle? : number, endAngle? : number, counterclockwise? : number) : void;		
+		/** !#en Adds an ellipse to the path.
+		!#zh 绘制椭圆路径。
+		@param cx The x axis of the coordinate for the center point.
+		@param cy The y axis of the coordinate for the center point.
+		@param rx The ellipse's x-axis radius.
+		@param ry The ellipse's y-axis radius. 
+		*/
+		ellipse(cx? : number, cy? : number, rx? : number, ry? : number) : void;		
+		/** !#en Adds an circle to the path.
+		!#zh 绘制圆形路径。
+		@param cx The x axis of the coordinate for the center point.
+		@param cy The y axis of the coordinate for the center point.
+		@param r The circle's radius. 
+		*/
+		circle(cx? : number, cy? : number, r? : number) : void;		
+		/** !#en Adds an rectangle to the path.
+		!#zh 绘制矩形路径。
+		@param x The x axis of the coordinate for the rectangle starting point.
+		@param y The y axis of the coordinate for the rectangle starting point.
+		@param w The rectangle's width.
+		@param h The rectangle's height. 
+		*/
+		rect(x? : number, y? : number, w? : number, h? : number) : void;		
+		/** !#en Adds an round corner rectangle to the path.
+		!#zh 绘制圆角矩形路径。
+		@param x The x axis of the coordinate for the rectangle starting point.
+		@param y The y axis of the coordinate for the rectangle starting point.
+		@param w The rectangles width.
+		@param h The rectangle's height.
+		@param r The radius of the rectangle. 
+		*/
+		roundRect(x? : number, y? : number, w? : number, h? : number, r? : number) : void;		
+		/** !#en Draws a filled rectangle.
+		!#zh 绘制填充矩形。
+		@param x The x axis of the coordinate for the rectangle starting point.
+		@param y The y axis of the coordinate for the rectangle starting point.
+		@param w The rectangle's width.
+		@param h The rectangle's height. 
+		*/
+		fillRect(x? : number, y? : number, w? : number, h? : number) : void;		
+		/** !#en Erasing any previously drawn content.
+		!#zh 擦除之前绘制的所有内容的方法。 
+		*/
+		clear() : void;		
+		/** !#en Causes the point of the pen to move back to the start of the current path. It tries to add a straight line from the current point to the start.
+		!#zh 将笔点返回到当前路径起始点的。它尝试从当前点到起始点绘制一条直线。 
+		*/
+		close() : void;		
+		/** !#en Strokes the current or given path with the current stroke style.
+		!#zh 根据当前的画线样式，绘制当前或已经存在的路径。 
+		*/
+		stroke() : void;		
+		/** !#en Fills the current or given path with the current fill style.
+		!#zh 根据当前的画线样式，填充当前或已经存在的路径。 
+		*/
+		stroke() : void;	
+	}		
 		/** Loader for resource loading process. It's a singleton object. */
 		export class loader extends Pipeline {		
 		/** The downloader in cc.loader's pipeline, it's by default the first pipe.
@@ -6296,7 +6425,7 @@ declare module cc {
 		    cc.log('Result should be a prefab: ' + (prefab instanceof cc.Prefab));
 		});
 		
-		// load the sprite frame (project/assets/resources/imgs/cocos.png/cocos) from resources folder
+		// load the sprite frame of (project/assets/resources/imgs/cocos.png) from resources folder
 		cc.loader.loadRes('imgs/cocos', cc.SpriteFrame, function (err, spriteFrame) {
 		    if (err) {
 		        cc.error(err.message || err);
@@ -6317,7 +6446,7 @@ declare module cc {
 		
 		@example 
 		```js
-		// load the texture (resources/imgs/cocos.png) and sprite frame (resources/imgs/cocos.png/cocos)
+		// load the texture (resources/imgs/cocos.png) and the corresponding sprite frame
 		cc.loader.loadResAll('imgs/cocos', function (err, assets) {
 		    if (err) {
 		        cc.error(err);
@@ -6695,135 +6824,6 @@ declare module cc {
 		``` 
 		*/
 		onComplete(error : any[], items : LoadingItems) : void;	
-	}		
-		/** undefined */
-		export class Graphics extends _RendererUnderSG {		
-		/** !#en
-		Current line width.
-		!#zh
-		当前线条宽度 */
-		lineWidth : number;		
-		/** !#en
-		lineJoin determines how two connecting segments (of lines, arcs or curves) with non-zero lengths in a shape are joined together.
-		!#zh
-		lineJoin 用来设置2个长度不为0的相连部分（线段，圆弧，曲线）如何连接在一起的属性。 */
-		lineJoin : Graphics.LineJoin;		
-		/** !#en
-		lineCap determines how the end points of every line are drawn.
-		!#zh
-		lineCap 指定如何绘制每一条线段末端。 */
-		lineCap : Graphics.LineCap;		
-		/** !#en
-		stroke color
-		!#zh
-		线段颜色 */
-		strokeColor : Color;		
-		/** !#en
-		fill color
-		!#zh
-		填充颜色 */
-		fillColor : Color;		
-		/** !#en
-		Sets the miter limit ratio
-		!#zh
-		设置斜接面限制比例 */
-		miterLimit : number;		
-		/** !#en Move path start point to (x,y).
-		!#zh 移动路径起点到坐标(x, y)
-		@param x The x axis of the coordinate for the end point.
-		@param y The y axis of the coordinate for the end point. 
-		*/
-		moveTo(x? : number, y? : number) : void;		
-		/** !#en Adds a straight line to the path
-		!#zh 绘制直线路径
-		@param x The x axis of the coordinate for the end point.
-		@param y The y axis of the coordinate for the end point. 
-		*/
-		lineTo(x? : number, y? : number) : void;		
-		/** !#en Adds a cubic Bézier curve to the path
-		!#zh 绘制三次贝赛尔曲线路径
-		@param c1x The x axis of the coordinate for the first control point.
-		@param c1y The y axis of the coordinate for first control point.
-		@param c2x The x axis of the coordinate for the second control point.
-		@param c2y The y axis of the coordinate for the second control point.
-		@param x The x axis of the coordinate for the end point.
-		@param y The y axis of the coordinate for the end point. 
-		*/
-		bezierCurveTo(c1x? : number, c1y? : number, c2x? : number, c2y? : number, x? : number, y? : number) : void;		
-		/** !#en Adds a quadratic Bézier curve to the path
-		!#zh 绘制二次贝赛尔曲线路径
-		@param cx The x axis of the coordinate for the control point.
-		@param cy The y axis of the coordinate for the control point.
-		@param x The x axis of the coordinate for the end point.
-		@param y The y axis of the coordinate for the end point. 
-		*/
-		quadraticCurveTo(cx? : number, cy? : number, x? : number, y? : number) : void;		
-		/** !#en Adds an arc to the path which is centered at (cx, cy) position with radius r starting at startAngle and ending at endAngle going in the given direction by counterclockwise (defaulting to false).
-		!#zh 绘制圆弧路径。圆弧路径的圆心在 (cx, cy) 位置，半径为 r ，根据 counterclockwise （默认为false）指定的方向从 startAngle 开始绘制，到 endAngle 结束。
-		@param cx The x axis of the coordinate for the center point.
-		@param cy The y axis of the coordinate for the center point.
-		@param r The arc's radius.
-		@param startAngle The angle at which the arc starts, measured clockwise from the positive x axis and expressed in radians.
-		@param endAngle The angle at which the arc ends, measured clockwise from the positive x axis and expressed in radians.
-		@param counterclockwise An optional Boolean which, if true, causes the arc to be drawn counter-clockwise between the two angles. By default it is drawn clockwise. 
-		*/
-		arc(cx? : number, cy? : number, r? : number, startAngle? : number, endAngle? : number, counterclockwise? : number) : void;		
-		/** !#en Adds an ellipse to the path.
-		!#zh 绘制椭圆路径。
-		@param cx The x axis of the coordinate for the center point.
-		@param cy The y axis of the coordinate for the center point.
-		@param rx The ellipse's x-axis radius.
-		@param ry The ellipse's y-axis radius. 
-		*/
-		ellipse(cx? : number, cy? : number, rx? : number, ry? : number) : void;		
-		/** !#en Adds an circle to the path.
-		!#zh 绘制圆形路径。
-		@param cx The x axis of the coordinate for the center point.
-		@param cy The y axis of the coordinate for the center point.
-		@param r The circle's radius. 
-		*/
-		circle(cx? : number, cy? : number, r? : number) : void;		
-		/** !#en Adds an rectangle to the path.
-		!#zh 绘制矩形路径。
-		@param x The x axis of the coordinate for the rectangle starting point.
-		@param y The y axis of the coordinate for the rectangle starting point.
-		@param w The rectangle's width.
-		@param h The rectangle's height. 
-		*/
-		rect(x? : number, y? : number, w? : number, h? : number) : void;		
-		/** !#en Adds an round corner rectangle to the path.
-		!#zh 绘制圆角矩形路径。
-		@param x The x axis of the coordinate for the rectangle starting point.
-		@param y The y axis of the coordinate for the rectangle starting point.
-		@param w The rectangles width.
-		@param h The rectangle's height.
-		@param r The radius of the rectangle. 
-		*/
-		roundRect(x? : number, y? : number, w? : number, h? : number, r? : number) : void;		
-		/** !#en Draws a filled rectangle.
-		!#zh 绘制填充矩形。
-		@param x The x axis of the coordinate for the rectangle starting point.
-		@param y The y axis of the coordinate for the rectangle starting point.
-		@param w The rectangle's width.
-		@param h The rectangle's height. 
-		*/
-		fillRect(x? : number, y? : number, w? : number, h? : number) : void;		
-		/** !#en Erasing any previously drawn content.
-		!#zh 擦除之前绘制的所有内容的方法。 
-		*/
-		clear() : void;		
-		/** !#en Causes the point of the pen to move back to the start of the current path. It tries to add a straight line from the current point to the start.
-		!#zh 将笔点返回到当前路径起始点的。它尝试从当前点到起始点绘制一条直线。 
-		*/
-		close() : void;		
-		/** !#en Strokes the current or given path with the current stroke style.
-		!#zh 根据当前的画线样式，绘制当前或已经存在的路径。 
-		*/
-		stroke() : void;		
-		/** !#en Fills the current or given path with the current fill style.
-		!#zh 根据当前的画线样式，填充当前或已经存在的路径。 
-		*/
-		stroke() : void;	
 	}		
 		/** <p>
 		 This class manages all events of input. include: touch, mouse, accelerometer, keyboard                                       <br/>
@@ -7351,6 +7351,15 @@ declare module cc {
 		Only useful on web 
 		*/
 		isRetinaEnabled() : boolean;		
+		/** !#en Whether to Enable on anti-alias
+		!#zh 控制抗锯齿是否开启
+		@param enabled Enable or not anti-alias 
+		*/
+		enableAntiAlias(enabled : boolean) : void;		
+		/** !#en Returns whether the current enable on anti-alias
+		!#zh 返回当前是否抗锯齿 
+		*/
+		isAntiAliasEnabled() : boolean;		
 		/** If enabled, the application will try automatically to enter full screen mode on mobile devices<br/>
 		You can pass true as parameter to enable it and disable it by passing false.<br/>
 		Only useful on web
@@ -8058,6 +8067,10 @@ declare module cc {
 		``` 
 		*/
 		getTextureColors(texture : Image) : any[];		
+		/** #en get all textures
+		#zh 获取所有贴图 
+		*/
+		getAllTextures() : Texture2D[];		
 		/** <p>Purges the dictionary of loaded textures. <br />
 		Call this method if you receive the "Memory Warning"  <br />
 		In the short term: it will free some resources preventing your app from being killed  <br />
@@ -8188,8 +8201,8 @@ declare module cc {
 		/** !#en Opacity of node, default value is 255.
 		!#zh 节点透明度，默认值为 255。 */
 		opacity : number;		
-		/** !#en Indicate whether node's opacity value affect its child nodes, default value is false.
-		!#zh 节点的不透明度值是否影响其子节点，默认值为 false。 */
+		/** !#en Indicate whether node's opacity value affect its child nodes, default value is true.
+		!#zh 节点的不透明度值是否影响其子节点，默认值为 true。 */
 		cascadeOpacity : boolean;		
 		/** !#en Color of node, default value is white: (255, 255, 255).
 		!#zh 节点颜色。默认为白色，数值为：（255，255，255）。 */
@@ -10252,35 +10265,8 @@ declare module cc {
 			BOUNCE_BOTTOM = 0,
 			BOUNCE_LEFT = 0,
 			BOUNCE_RIGHT = 0,
-			AUTOSCROLL_ENDED = 0,		
-		}	
-	}	
-	
-	/****************************************************
-	* VideoPlayer
-	*****************************************************/
-	
-	export module VideoPlayer {		
-		/** !#en Video event type
-		!#zh 视频事件类型 */
-		export enum EventType {			
-			PLAYING = 0,
-			PAUSED = 0,
-			STOPPED = 0,
-			COMPLETED = 0,		
-		}	
-	}	
-	
-	/****************************************************
-	* VideoPlayer
-	*****************************************************/
-	
-	export module VideoPlayer {		
-		/** !#en Enum for video resouce type type.
-		!#zh 视频来源 */
-		export enum ResourceType {			
-			REMOTE = 0,
-			LOCAL = 0,		
+			AUTOSCROLL_ENDED = 0,
+			TOUCH_UP = 0,		
 		}	
 	}	
 	
@@ -10324,6 +10310,34 @@ declare module cc {
 			CUSTOM = 0,
 			TRIMMED = 0,
 			RAW = 0,		
+		}	
+	}	
+	
+	/****************************************************
+	* VideoPlayer
+	*****************************************************/
+	
+	export module VideoPlayer {		
+		/** !#en Video event type
+		!#zh 视频事件类型 */
+		export enum EventType {			
+			PLAYING = 0,
+			PAUSED = 0,
+			STOPPED = 0,
+			COMPLETED = 0,		
+		}	
+	}	
+	
+	/****************************************************
+	* VideoPlayer
+	*****************************************************/
+	
+	export module VideoPlayer {		
+		/** !#en Enum for video resouce type type.
+		!#zh 视频来源 */
+		export enum ResourceType {			
+			REMOTE = 0,
+			LOCAL = 0,		
 		}	
 	}	
 	
@@ -10547,6 +10561,34 @@ declare module cc {
 	}	
 	
 	/****************************************************
+	* Graphics
+	*****************************************************/
+	
+	export module Graphics {		
+		/** !#en Enum for LineCap.
+		!#zh 线段末端属性 */
+		export enum LineCap {			
+			BUTT = 0,
+			ROUND = 0,
+			SQUARE = 0,		
+		}	
+	}	
+	
+	/****************************************************
+	* Graphics
+	*****************************************************/
+	
+	export module Graphics {		
+		/** !#en Enum for LineJoin.
+		!#zh 线段拐角属性 */
+		export enum LineJoin {			
+			BEVEL = 0,
+			ROUND = 0,
+			MITER = 0,		
+		}	
+	}	
+	
+	/****************************************************
 	* Pipeline
 	*****************************************************/
 	
@@ -10609,34 +10651,6 @@ declare module cc {
 			@param extMap Custom supported types with corresponded handler 
 			*/
 			addHandlers(extMap : any) : void;		
-		}	
-	}	
-	
-	/****************************************************
-	* Graphics
-	*****************************************************/
-	
-	export module Graphics {		
-		/** !#en Enum for LineCap.
-		!#zh 线段末端属性 */
-		export enum LineCap {			
-			BUTT = 0,
-			ROUND = 0,
-			SQUARE = 0,		
-		}	
-	}	
-	
-	/****************************************************
-	* Graphics
-	*****************************************************/
-	
-	export module Graphics {		
-		/** !#en Enum for LineJoin.
-		!#zh 线段拐角属性 */
-		export enum LineJoin {			
-			BEVEL = 0,
-			ROUND = 0,
-			MITER = 0,		
 		}	
 	}	
 	
@@ -11904,38 +11918,42 @@ declare module sp {
 		setSlotsToSetupPose() : void;		
 		/** !#en
 		Finds a bone by name.
-		This does a string comparison for every bone.
+		This does a string comparison for every bone.<br>
+		Returns a {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.Bone object.
 		!#zh
 		通过名称查找 bone。
-		这里对每个 bone 的名称进行了对比。 
+		这里对每个 bone 的名称进行了对比。<br>
+		返回一个 {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.Bone 对象。 
 		*/
 		findBone(boneName : string) : spine.Bone;		
 		/** !#en
-		Finds a slot by name.
-		This does a string comparison for every slot.
+		Finds a slot by name. This does a string comparison for every slot.<br>
+		Returns a {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.Slot object.
 		!#zh
-		通过名称查找 slot。
-		这里对每个 slot 的名称进行了比较。 
+		通过名称查找 slot。这里对每个 slot 的名称进行了比较。<br>
+		返回一个 {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.Slot 对象。 
 		*/
 		findSlot(slotName : string) : spine.Slot;		
 		/** !#en
 		Finds a skin by name and makes it the active skin.
-		This does a string comparison for every skin.
-		Note that setting the skin does not change which attachments are visible.
+		This does a string comparison for every skin.<br>
+		Note that setting the skin does not change which attachments are visible.<br>
+		Returns a {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.Skin object.
 		!#zh
-		按名称查找皮肤，激活该皮肤。
-		这里对每个皮肤的名称进行了比较。
-		注意：设置皮肤不会改变 attachment 的可见性。。 
+		按名称查找皮肤，激活该皮肤。这里对每个皮肤的名称进行了比较。<br>
+		注意：设置皮肤不会改变 attachment 的可见性。<br>
+		返回一个 {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.Skin 对象。 
 		*/
 		setSkin(skinName : string) : spine.Skin;		
 		/** !#en
 		Returns the attachment for the slot and attachment name.
-		The skeleton looks first in its skin, then in the skeleton data’s default skin.
+		The skeleton looks first in its skin, then in the skeleton data’s default skin.<br>
+		Returns a {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.Attachment object.
 		!#zh
-		通过 slot 和 attachment 的名称获取 attachment。
-		Skeleton 优先查找它的皮肤，然后才是 Skeleton Data 中默认的皮肤。 
+		通过 slot 和 attachment 的名称获取 attachment。Skeleton 优先查找它的皮肤，然后才是 Skeleton Data 中默认的皮肤。<br>
+		返回一个 {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.Attachment 对象。 
 		*/
-		getAttachment(slotName : string, attachmentName : string) : spine.RegionAttachment;		
+		getAttachment(slotName : string, attachmentName : string) : spine.Attachment;		
 		/** !#en
 		Sets the attachment for the slot and attachment name.
 		The skeleton looks first in its skin, then in the skeleton data’s default skin.
@@ -11948,8 +11966,10 @@ declare module sp {
 		!#zh 设置 Skeleton 中的 Skeleton Data。 
 		*/
 		setSkeletonData(skeletonData : spine.SkeletonData, ownsSkeletonData : spine.SkeletonData) : void;		
-		/** !#en Sets animation state data.
-		!#zh 设置动画状态数据。 
+		/** !#en Sets animation state data.<br>
+		The parameter type is {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.AnimationStateData.
+		!#zh 设置动画状态数据。<br>
+		参数是 {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.AnimationStateData。 
 		*/
 		setAnimationStateData(stateData : spine.AnimationStateData) : void;		
 		/** !#en
@@ -11962,16 +11982,22 @@ declare module sp {
 		!#zh 设置动画事件监听器。 
 		*/
 		setAnimationListener(target : any, callback : Function) : void;		
-		/** !#en Set the current animation. Any queued animations are cleared.
-		!#zh 设置当前动画。队列中的任何的动画将被清除。 
+		/** !#en Set the current animation. Any queued animations are cleared.<br>
+		Returns a {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.TrackEntry object.
+		!#zh 设置当前动画。队列中的任何的动画将被清除。<br>
+		返回一个 {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.TrackEntry 对象。 
 		*/
 		setAnimation(trackIndex : number, name : string, loop : boolean) : spine.TrackEntry;		
-		/** !#en Adds an animation to be played delay seconds after the current or last queued animation.
-		!#zh 添加一个动画到动画队列尾部，还可以延迟指定的秒数。 
+		/** !#en Adds an animation to be played delay seconds after the current or last queued animation.<br>
+		Returns a {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.TrackEntry object.
+		!#zh 添加一个动画到动画队列尾部，还可以延迟指定的秒数。<br>
+		返回一个 {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.TrackEntry 对象。 
 		*/
 		addAnimation(trackIndex : number, name : string, loop : boolean, delay? : number) : spine.TrackEntry;		
-		/** !#en Returns track entry by trackIndex.
-		!#zh 通过 track 索引获取 TrackEntry。 
+		/** !#en Returns track entry by trackIndex.<br>
+		Returns a {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.TrackEntry object.
+		!#zh 通过 track 索引获取 TrackEntry。<br>
+		返回一个 {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.TrackEntry 对象。 
 		*/
 		getCurrent(trackIndex : void) : spine.TrackEntry;		
 		/** !#en Clears all tracks of animation state.
@@ -12009,8 +12035,10 @@ declare module sp {
 		see http://en.esotericsoftware.com/spine-using-runtimes#Scaling
 		!#zh 可查看 Spine 官方文档： http://zh.esotericsoftware.com/spine-using-runtimes#Scaling */
 		scale : number;		
-		/** !#en Get the included SkeletonData used in spine runtime.
-		!#zh 获取 Spine Runtime 使用的 SkeletonData。 
+		/** !#en Get the included SkeletonData used in spine runtime.<br>
+		Returns a {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.SkeletonData object.
+		!#zh 获取 Spine Runtime 使用的 SkeletonData。<br>
+		返回一个 {{#crossLinkModule "spine"}}spine{{/crossLinkModule}}.SkeletonData 对象。 
 		*/
 		getRuntimeData(quiet? : boolean) : spine.SkeletonData;	
 	}	
@@ -12022,6 +12050,13 @@ declare module sp {
 		COMPLETE = 0,
 		EVENT = 0,	
 	}
+}
+/** !#en
+`spine` is the namespace for official Spine Runtime, which officially implemented and maintained by Spine.<br>
+Please refer to the official documentation for its detailed usage: [http://en.esotericsoftware.com/spine-using-runtimes](http://en.esotericsoftware.com/spine-using-runtimes)
+!#zh
+spine 模块是 Spine 官方运行库的 API 入口，由 Spine 官方统一实现和维护，具体用法请参考：[http://zh.esotericsoftware.com/spine-using-runtimes](http://zh.esotericsoftware.com/spine-using-runtimes) */
+declare module spine {
 }
 /** This module provides some JavaScript utilities.
 All members can be accessed with cc.js */
