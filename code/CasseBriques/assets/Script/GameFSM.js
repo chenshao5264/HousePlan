@@ -11,15 +11,31 @@ var gamefsm = (function(){
     }
 
     function cls() {
-        cc.log("new gamefsm");
+
     }
 
     var that = {};
+    var _eventDispatchNode = null;
+
+    that.state = 0;
     that.GameStart = function() {
+        cc.log("game start");
+        this.state = 1;
         dataMgr.getInstance().setIsGameOver(false);
     };
     that.GameOver = function() {
+        if (this.state === 0) {
+            return;
+        }
+        cc.log("game over");
+        this.state = 0;
         dataMgr.getInstance().setIsGameOver(true);
+        _eventDispatchNode.emit("evt_game_over");
+    };
+    
+   
+    that.setEventDispatchNode = function(node) {
+        _eventDispatchNode = node;
     };
 
     cls.prototype = that;

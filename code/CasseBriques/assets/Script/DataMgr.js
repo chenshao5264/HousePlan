@@ -7,12 +7,13 @@ var dataMgr = (function(){
         return unique;
     }
     function cls() {
-        cc.log("new dataMgr");
+     
     }
 
     var that = {};
     var _isGameOver =  false;
-    var _downBrickSpeed = 100;
+    var _downBrickSpeed = 200; // 砖块下降速度
+    var _spBricks = []; //
 
     that.getIsGameOver = function() {
         return _isGameOver;
@@ -27,9 +28,50 @@ var dataMgr = (function(){
     that.getDownSpeed = function() {
         return _downBrickSpeed;
     };
-     that.getTopSpeed = function() {
+    that.setDownSpeed = function(speed) {
+        _downBrickSpeed = speed;
+    };
+    that.getTopSpeed = function() {
         return 500;
     };
+    that.pushBackBrick2List = function (spBrick) {
+        _spBricks.push(spBrick);
+        cc.log("_spBricks.length = %d", _spBricks.length);
+    };
+
+    that.getLastBrickSprite = function() {
+        if (_spBricks.length > 0) {
+            return  _spBricks[_spBricks.length - 1];
+        }
+        return null;
+    };
+    that.getFirstBrickSpriteByIndex = function(index) {
+        if (_spBricks.length > 0) {
+            return  _spBricks[index];
+        }
+        return null;
+    };
+
+    that.isFirstGroup = function(spBrick) {
+        if (_spBricks.length > 3) {
+            for (var i = 0; i < 4; ++i) {
+                if (_spBricks[i] === spBrick) {
+                    return i;
+                }
+            } 
+         } else {
+             return 0;
+         } 
+         return -1;
+    };
+
+    function removeFirstBrickGroupFromList() {
+        _spBricks.shift();
+    }
+
+    that.removeFirstBrockGroup = function() {
+        removeFirstBrickGroupFromList();
+    };  
 
     
     cls.prototype = that;

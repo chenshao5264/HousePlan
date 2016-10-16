@@ -1,5 +1,5 @@
 var dataMgr = require('DataMgr');
-
+var gameFSM = require('GameFSM');
 // var BrickType = cc.Enum({
 //    Down2Top: 0,
 //    Top2Down: 1,
@@ -19,60 +19,77 @@ cc.Class({
         this.isEnd = false;
     },
 
-    init: function(brickType, speed) {
-        this.brickType = brickType;
-        if (brickType == 0) {
-            this.moveSpeed = TOPSPEED;
-        } else {
-            this.moveSpeed = -speed;
-        }
+    init: function(brickType, areaTag) {
+       this.brickType = brickType;
+       this.areaTag = areaTag
+       this.parent = this.node.getParent();
+       this.isCheckEmit = false;
     },
-
-    onCollisionEnter: function (other, self) {
-        if (this.brickType == 0) {
-          
-        } else {
-            if (other.node.group === "BottomWall") {
-               
-            }
-        }
-        
-    },
-
-    //  onCollisionStay: function (other, self) {
-    //      cc.log("onCollisionStay");
-    //  },
-
-     onCollisionExit: function (other) {
-         if (this.brickType == 0) {
-            if (other.node.group === "Wall") {
-                cc.log("top onCollisionExit");
-                this.node.destroy();
-               
-            }
-         } else {
-             if (other.node.group === "Wall") {
-                var parent = this.node.getParent();
-                parent.emit("brickcount");
-                //this.moveSpeed = 0;
-            } else if (other.node.group === "BottomWall") {
-                 this.node.destroy();
-            }
-         }
-     },
 
     moveTop: function(dt) {
+       
         this.node.y += dt * dataMgr.getInstance().getTopSpeed();
+
+        this.checkCollision();
     },
 
     moveDown: function(dt) {
-        this.node.y -= dt * dataMgr.getInstance().getDownSpeed();
+        //cc.log("this.node.y = %d", this.node.y);
+
+        if (!this.isCheckEmit && this.node.y <= 400) {
+            if (this.parent) {
+                 this.parent.emit("newgroup");
+                 this.isCheckEmit = true;
+            }
+        }
+
+        if (this.node.y <= -200) {
+            //dataMgr.getInstance().setDownSpeed(0);
+            gameFSM.getInstance().GameOver();
+            return;
+        } 
+
+        var tmpFlag = dataMgr.getInstance().isFirstGroup(this.node);
+       if (tmpFlag >= 0){
+            this.node.y -= dt * dataMgr.getInstance().getDownSpeed();
+            for (var i = 4; i < 100000; i += 4) {
+                var sp = dataMgr.getInstance().getFirstBrickSpriteByIndex(i + tmpFlag);
+                if (sp) {
+                     sp.y = this.node.y + sp.height * (Math.floor(i / 4));
+                } else {
+                    break;
+                }
+            }
+       } 
+    },
+
+    checkCollision: function() {
+        var curAreaTag = this.areaTag;
+        var spBrick = dataMgr.getInstance().getFirstBrickSpriteByIndex(curAreaTag);
+        var curTargetPosY = this.node.y;
+        var goalTargetPosY = spBrick.y;
+
+        if (spBrick.opacity !== 0) {
+            if (goalTargetPosY - curTargetPosY <= spBrick.height) {
+                this.brickType = 1;
+                return true;
+            }
+        } else {
+            if (goalTargetPosY - curTargetPosY <= 0) {
+                this.brickType = 1;
+                 return true;
+            }
+        }
+        return false;
     },
 
     // called every frame, uncomment this function to activate update callback
      update: function (dt) {
-
-         if (this.brickType == 0) {
+         if ( gameFSM.getInstance().state === 0){
+            // cc.log("this.areaTag = " + this.areaTag);
+             return;
+         }
+         if (this.brickType === 0) {
             this.moveTop(dt);
          } else {
             this.moveDown(dt);
