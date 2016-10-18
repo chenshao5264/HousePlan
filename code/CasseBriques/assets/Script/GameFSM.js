@@ -21,7 +21,7 @@ var gamefsm = (function(){
     that.GameStart = function() {
         cc.log("game start");
         this.state = 1;
-        dataMgr.getInstance().setIsGameOver(false);
+        dataMgr.getInstance().setGameStart(false);
     };
     that.GameOver = function() {
         if (this.state === 0) {
@@ -29,7 +29,7 @@ var gamefsm = (function(){
         }
         cc.log("game over");
         this.state = 0;
-        dataMgr.getInstance().setIsGameOver(true);
+        dataMgr.getInstance().setGameOver(true);
         _eventDispatchNode.emit("evt_game_over");
     };
     

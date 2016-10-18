@@ -53,11 +53,18 @@ cc.Class({
         var tmpDefault = Math.floor(Math.random() * 4);
         var  tmpArray = []
          for (var i = 0; i < 4; ++i){
-            var spBrick = this.createBrick(1, i);
-            tmpArray.push(spBrick);
-            if (i == tmpDefault) {
-                spBrick.opacity  = 0;
-            }
+            // var spBrick = this.createBrick(1, i);
+            // tmpArray.push(spBrick);
+            // if (i == tmpDefault) {
+            //     spBrick.opacity = 0;
+            // }
+
+            if (i !== tmpDefault) {
+                var spBrick = this.createBrick(1, i);
+                tmpArray.push(spBrick);
+             } else {
+                  tmpArray.push(null);
+             }
         }
 
         for (i in tmpArray) {

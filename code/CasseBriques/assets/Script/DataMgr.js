@@ -15,12 +15,14 @@ var dataMgr = (function(){
     var _downBrickSpeed = 200; // 砖块下降速度
     var _spBricks = []; //
 
-    that.getIsGameOver = function() {
-        return _isGameOver;
+    that.setGameStart = function() {
+        _spBricks = [];
+        _isGameOver = false;
     };
-    that.setIsGameOver = function(value) {
-       _isGameOver = value;
+    that.setGameOver = function() {
+        _isGameOver = true;
     };
+
     that.addDownBrickSpeed = function(value) {
        _downBrickSpeed += 10;
        cc.log("_downBrickSpeed = " + _downBrickSpeed);
@@ -34,11 +36,19 @@ var dataMgr = (function(){
     that.getTopSpeed = function() {
         return 500;
     };
-    that.pushBackBrick2List = function (spBrick) {
-        _spBricks.push(spBrick);
-        cc.log("_spBricks.length = %d", _spBricks.length);
+
+    that.newGroupBrickBornTime = function() {
+        return 
     };
 
+    that.pushBackBrick2List = function (spBrick) {
+        _spBricks.push(spBrick);
+       // cc.log("_spBricks.length = %d", _spBricks.length);
+    };
+
+    that.getBrickListLength = function() {
+        return _spBricks.length;
+    };
     that.getLastBrickSprite = function() {
         if (_spBricks.length > 0) {
             return  _spBricks[_spBricks.length - 1];
@@ -57,7 +67,7 @@ var dataMgr = (function(){
             for (var i = 0; i < 4; ++i) {
                 if (_spBricks[i] === spBrick) {
                     return i;
-                }
+                } 
             } 
          } else {
              return 0;
