@@ -14,99 +14,58 @@ cc.Class({
 
     // use this for initialization
     onLoad: function () {
-       
         this.brickType = 0;
-        this.isEnd = false;
     },
 
     init: function(brickType, areaTag) {
        this.brickType = brickType;
        this.areaTag = areaTag
-       this.parent = this.node.getParent();
-       this.isCheckEmit = false;
     },
 
     moveTop: function(dt) {
-       
         this.node.y += dt * dataMgr.getInstance().getTopSpeed();
 
-        //this.checkCollision();
-    },
-
-    moveDown: function(dt) {
-        //cc.log("this.node.y = %d", this.node.y);
-
-        if (!this.isCheckEmit && this.node.y <= 400) {
-            if (this.parent) {
-                 this.parent.emit("newgroup");
-                 this.isCheckEmit = true;
-            }
-        }
-
-        if (this.node.y <= 0) {
-            //dataMgr.getInstance().setDownSpeed(0);
-            gameFSM.getInstance().GameOver();
-            return;
-        } 
-
-       var tmpFlag = dataMgr.getInstance().isFirstGroup(this.node);
-
-       if (tmpFlag >= 0){
-            this.node.y -= dt * dataMgr.getInstance().getDownSpeed();
-            for (var i = 4; i < 10000; i += 4) {
-                var sp = dataMgr.getInstance().getFirstBrickSpriteByIndex(i + this.areaTag);
-                if (sp) {
-                     sp.y = this.node.y + sp.height * (Math.floor(i / 4));
-                } else {
-                   // cc.log("i = %d", i);
-                   // break;
-                }
-            }
-       } 
-    },
-
-    getBrick: function(curAreaTag) {
-        for (var i = 0; i < 10000; i += 4) {
-            var spBrick = dataMgr.getInstance().getFirstBrickSpriteByIndex(curAreaTag + i);
-            if (spBrick.opacity !== 0) {
-                return spBrick;
-            }
-        }
-        return null;
+        this.checkCollision();
     },
 
     checkCollision: function() {
-        var curAreaTag = this.areaTag;
-        var spBrick = this.getBrick(curAreaTag);
-        if (spBrick === null) {
-            return;
-        }
-        var curTargetPosY = this.node.y;
-        var goalTargetPosY = spBrick.y;
-
-        if (goalTargetPosY - curTargetPosY <= spBrick.height) {
-            this.brickType = 1;
-            for (var i = 0; i < 4; ++i){
-                dataMgr.getInstance().pushBackBrick2List(this.node);
+        var curTarget = this.node;
+        var areaTag = this.areaTag;
+        var length = dataMgr.getInstance().getBrickListLength() / 4;
+        var spBrick = null;
+        var row = -1;
+        for (var i = 0; i < length; ++i){
+            spBrick = dataMgr.getInstance().getBrickSpriteByIndex(areaTag + i * 4);
+            if (spBrick) {
+                row = i;
+                break;
             }
-            return true;
         }
-        return false;
+
+       
+        if(spBrick) {
+            if (spBrick.y - curTarget.y <= curTarget.height) {
+                this.brickType = 1;
+                curTarget.y = spBrick.y - curTarget.height;
+                
+                row = row - 1;
+                //cc.log("row = %d", row);
+                var isFull = dataMgr.getInstance().checkFullGroup(row, areaTag, curTarget);
+                //cc.log("isFull = ", isFull);
+
+                if (isFull) {
+                    var parent = curTarget.getParent();
+                    parent.emit("evt_eliminate", {msg: row});
+                }
+            }
+        }
     },
+
 
     // called every frame, uncomment this function to activate update callback
      update: function (dt) {
           if (this.brickType === 0) {
             this.moveTop(dt);
-         } 
-         if ( gameFSM.getInstance().state === 0){
-            // cc.log("this.areaTag = " + this.areaTag);
-             return;
          }
-         if (this.brickType === 0) {
-           // this.moveTop(dt);
-         } else {
-            //this.moveDown(dt);
-         } 
      },
 });

@@ -1,11 +1,12 @@
 var gameFSM = require('GameFSM');
 var dataMgr = require('DataMgr');
 
- var BRICK_HEIGHT = 53;
+//var BRICK_HEIGHT = 53;
 cc.Class({
     extends: cc.Component,
 
     properties: {
+       labelScore: cc.Label,
        btnStart: cc.Button,
        brickLayer: cc.Node,
        btnBrick: {
@@ -21,6 +22,7 @@ cc.Class({
             default: []
         },
         brickPrefab: cc.Prefab
+
     },
 
     // use this for initialization
@@ -28,6 +30,7 @@ cc.Class({
         //var self = this;
         gameFSM.getInstance().setEventDispatchNode(this.brickLayer);
         this.brickLayer.on("evt_game_over", this.evtGameOver.bind(this));
+        this.brickLayer.on("evt_eliminate", this.evtEeliminate.bind(this));
 
          // 上升砖块起始坐标
         this.posTopBrickOris = new Array();
@@ -42,6 +45,43 @@ cc.Class({
         }
 
         this.elapseTime = 0;
+        this.socre = 0;
+    },
+
+    // evt 消除某一行
+    evtEeliminate: function(event) {
+        var row = event.detail.msg;
+        var bIndex = row * 3 + row;
+        for (var i = bIndex; i < 4 + bIndex; ++i) {
+            var spBrick = dataMgr.getInstance().getBrickSpriteByIndex(i);
+            spBrick.removeFromParent();
+        }
+        
+        // 调整消除行前面的坐标
+        function adjuestPos() {
+            var eIndex = bIndex;
+            for (var i = 0; i < eIndex; ++i) {
+                var spBrick = dataMgr.getInstance().getBrickSpriteByIndex(i);
+                if (spBrick) {
+                    spBrick.y = spBrick.y + spBrick.height;
+                }   
+            }
+        }
+        adjuestPos();
+
+        dataMgr.getInstance().removeGroupByRowIndex(row);
+
+        this.afterEeliminate();
+    },
+
+    //< 消除一行后事件
+    afterEeliminate: function(event) {
+         this.socre += 1;
+         this.labelScore.string = "Score: " + this.socre;
+
+         if (this.socre % 10 == 0) {
+              dataMgr.getInstance().addDownBrickSpeed();
+         }
     },
 
     // evt gameover
@@ -65,12 +105,6 @@ cc.Class({
         var tmpDefault = Math.floor(Math.random() * 4);
         var  tmpArray = []
          for (var i = 0; i < 4; ++i){
-            // var spBrick = this.createBrick(1, i);
-            // tmpArray.push(spBrick);
-            // if (i == tmpDefault) {
-            //     spBrick.opacity = 0;
-            // }
-
             if (i !== tmpDefault) {
                 var spBrick = this.createBrick(1, i);
                 tmpArray.push(spBrick);
@@ -79,7 +113,7 @@ cc.Class({
              }
         }
 
-        for (i in tmpArray) {
+        for (var i = 0; i < 4; ++i) {
             dataMgr.getInstance().pushBackBrick2List(tmpArray[i]);
         }
     },
@@ -108,6 +142,9 @@ cc.Class({
 
     //<
      onCreateTopBrick: function(event) {
+         if (gameFSM.getInstance().state === 0){
+             return;
+         }
         var node = event.target;
         var btn = node.getComponent(cc.Button);
         var selectedIndex = 0;
@@ -125,38 +162,36 @@ cc.Class({
 
     // called every frame, uncomment this function to activate update callback
      update: function (dt) {
-          if ( gameFSM.getInstance().state === 0){
-            // cc.log("this.areaTag = " + this.areaTag);
+         if (gameFSM.getInstance().state === 0){
              return;
          }
 
+        var firstBrick = dataMgr.getInstance().getFirstBrick();
+        if (firstBrick.y <= -200) {
+            gameFSM.getInstance().GameOver();
+            return;
+        }
+
         this.elapseTime += dt;
-        if (this.elapseTime >= BRICK_HEIGHT / dataMgr.getInstance().getDownSpeed() - 0.1) {
+        if (this.elapseTime >= firstBrick.height / dataMgr.getInstance().getDownSpeed() - 0.1) {
             this.elapseTime = 0;
             this.createBrickGroup();
-
-        }
-       
-        var firstBrick = dataMgr.getInstance().getFirstBrickSpriteByIndex(0);
-        if (firstBrick === null) {
-            firstBrick = dataMgr.getInstance().getFirstBrickSpriteByIndex(1);
         }
 
-        var length = dataMgr.getInstance().getBrickListLength() / 4;
-
-        for (var k = 0; k < 4; ++k){
-            var spBrick = dataMgr.getInstance().getFirstBrickSpriteByIndex(k);
-            if (spBrick) {
-                spBrick.y -= dt * dataMgr.getInstance().getDownSpeed();
-            }
-            
-            for(var i = 1; i < length; ++i) {
-                var sp = dataMgr.getInstance().getFirstBrickSpriteByIndex(k + 4 * i);
-                if (sp) {
-                    sp.y = firstBrick.y +  BRICK_HEIGHT * i;
+        var length = dataMgr.getInstance().getBrickListLength();
+        var h = 0;
+        for (var i = 0; i < length; i += 4) {
+            for (var k = 0; k < 4; ++k) {
+                var spBrick = dataMgr.getInstance().getBrickSpriteByIndex(i + k);
+                if(spBrick){
+                    if (i < 4) {
+                        spBrick.y -= dt * dataMgr.getInstance().getDownSpeed();
+                    } else {
+                        spBrick.y = firstBrick.y + firstBrick.height * h;
+                    }
                 }
             }
+            ++h;
         }
-       
      },
 });

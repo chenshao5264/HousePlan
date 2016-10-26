@@ -12,7 +12,7 @@ var dataMgr = (function(){
 
     var that = {};
     var _isGameOver =  false;
-    var _downBrickSpeed = 200; // 砖块下降速度
+    var _downBrickSpeed = 50; // 砖块下降速度
     var _spBricks = []; //
 
     that.setGameStart = function() {
@@ -24,7 +24,7 @@ var dataMgr = (function(){
     };
 
     that.addDownBrickSpeed = function(value) {
-       _downBrickSpeed += 10;
+       _downBrickSpeed += 5;
        cc.log("_downBrickSpeed = " + _downBrickSpeed);
     };
     that.getDownSpeed = function() {
@@ -55,11 +55,53 @@ var dataMgr = (function(){
         }
         return null;
     };
-    that.getFirstBrickSpriteByIndex = function(index) {
+    that.getBrickSpriteByIndex = function(index) {
         if (_spBricks.length > 0) {
             return  _spBricks[index];
         }
         return null;
+    };
+
+    that.removeGroupByRowIndex = function(row) {
+         var bIndex = row * 3 + row;
+         _spBricks.splice(bIndex, 4);
+    };
+
+    //< 检测是否为完整的一行
+    that.checkFullGroup = function(row, areaTag, spBrick) {
+       var isFull = true;
+       if (row == -1) {
+            for (var i = 0; i < 4; ++i) {
+                _spBricks.unshift(null);
+            }
+            _spBricks[areaTag] = spBrick;
+            isFull = false;
+       } else {
+            var fillIndex = row * 4 + areaTag;
+            _spBricks[fillIndex] = spBrick;
+
+            //< 具体检测
+            var bIndex = row * 3 + row;
+            for (var i = bIndex; i < 4 + bIndex; ++i) {
+               if (_spBricks[i] === null) {
+                   isFull = false;
+               }
+            }
+       }
+
+       return isFull;
+    };
+
+
+    that.getFirstBrick = function() {
+        var spBrick 
+        for (var i = 0; i < 4; ++i){
+            if (_spBricks[i]) {
+                spBrick = _spBricks[i];
+                break;
+            }
+        }
+        return spBrick;
     };
 
     that.isFirstGroup = function(spBrick) {
